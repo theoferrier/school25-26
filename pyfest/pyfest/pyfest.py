@@ -1,51 +1,92 @@
-lineup = [
-    ("Ken Karson", "Rap", 67),
-    ("Yeat", "Rap", 41),
-    ("Playboi Carti", "Rap", 61)
+﻿lineup = [
+    ("Code Play", "Indie", 30),
+    ("The Pythonistas", "Rock", 45),
+    ("Syntax Error", "Metal", 60)
 ]
+print("Welcome to the Py-Fest 2026 Stage Manager!")
+while True:
+    print("\n---Py-Fest 2026 Stage Manager ---")
+    print("1. View Lineup & Total Time")
+    print("2. Add a New Band")
+    print("3. Move First Band to End (Late Arrival)")
+    print("4. Remove a Band by Name")
+    print("5. Move Band to Specific Position")  # New Feature!
+    print("6. Exit")
 
-headliner = ("Esdeekid", "UK Rap", 93)
-lineup.append(headliner)
+    choice = input("Select an option (1-6): ")
 
-print("\n--- Py-Fest 2026 Stage Manager ---")
-print("   1. View Lineup & Total Time")
-print("        2. Add a New Band")
-print("    3. Move First Band to End")
-print("     4. Remove Band by Name")
-print("   5. Move Band by Specific Name")
-print("            6. Exit")
-option = int(input("Select an option (1-6): "))
-while option != 6:
-    if option == 1:
+    if choice == "1":
         print("\n--- Current Lineup ---")
         total_time = 0
-        for band in lineup:
-            print(f"{band[0]}  {band[1]}  {band[2]} mins")
-            total_time += band[2]
-        print(f"Total Performance Time: {total_time} mins\n")
-    elif option == 2:
-        band_name = input("Enter the band's name: ")
-        genre = input("Enter the band's genre: ")
-        performance_time = int(input("Enter the band's performance time (in mins): "))
-        lineup.append((band_name, genre, performance_time))
-    elif option == 3:
-        first_band = lineup.pop(0)
-        lineup.append(first_band)
-    elif option == 4:
-        name = input("Enter the name of the band to remove: ")
-        lineup = [band for band in lineup if band[0] != name]
-    elif option == 5:
-        band_name = input("Enter the name of the band to move: ")
-        # Find the band tuple by name
-        band_to_move = None
-        for band in lineup:
-            if band[0] == band_name:
-                band_to_move = band
-                break
-        if band_to_move:
-            lineup.remove(band_to_move)
-            lineup.append(band_to_move)
+        for i, (name, genre, duration) in enumerate(lineup, 1):
+            print(f"{i}. {name} ({genre}) - {duration} mins")
+            total_time += duration
+        print(f"Total Festival Duration: {total_time} minutes")
+
+    elif choice == "2":
+        name = input("Enter band name: ")
+        genre = input("Enter genre: ")
+        try:
+            duration = int(input("Enter performance duration (minutes): "))
+            lineup.append((name, genre, duration))
+            print(f"{name} added!")
+        except ValueError:
+            print("Invalid duration.")
+
+    elif choice == "3":
+        if len(lineup) > 1:
+            late_band = lineup.pop(0)
+            lineup.append(late_band)
+            print(f"{late_band[0]} moved to the end.")
         else:
-            print(f"Band '{band_name}' not found in lineup.")
-     else:
-         break
+            print("Not enough bands to swap!")
+
+    elif choice == "4":
+        name_to_remove = input("Enter the name of the band to remove: ")
+        found = False
+        for artist in lineup:
+            if artist[0].lower() == name_to_remove.lower():
+                lineup.remove(artist)
+                print(f"🗑{artist[0]} removed.")
+                found = True
+                break
+        if not found:
+            print(f"Band '{name_to_remove}' not found.")
+
+    elif choice == "5":
+        # New Logic: Move a band
+        name_to_move = input("Enter the name of the band to move: ")
+
+        # 1. Find the band and its current index
+        target_artist = None
+        current_index = -1
+
+        for i, artist in enumerate(lineup):
+            if artist[0].lower() == name_to_move.lower():
+                target_artist = artist
+                current_index = i
+                break
+
+        if target_artist:
+            try:
+                # 2. Get the new position from user
+                new_pos = int(input(f"Enter new position (1-{len(lineup)}): "))
+
+                if 1 <= new_pos <= len(lineup):
+                    # 3. Remove from old spot, insert in new spot
+                    # We subtract 1 from new_pos because users count from 1, Python counts from 0
+                    lineup.pop(current_index)
+                    lineup.insert(new_pos - 1, target_artist)
+                    print(f"{target_artist[0]} moved to position {new_pos}!")
+                else:
+                    print("Position out of range.")
+            except ValueError:
+                print("Please enter a valid number for the position.")
+        else:
+            print(f"Band '{name_to_move}' not found.")
+
+    elif choice == "6":
+        print("Exiting Stage Manager. Have a great show!")
+        break
+    else:
+        print("Invalid choice.")
